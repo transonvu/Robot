@@ -8,11 +8,12 @@ cw = CleverWrap("CC1jbQ1nO5wGPNeZ5UgNCKuhH5g")
 r = sr.Recognizer()
 
 while True:
-    with sr.WavFile("record.wav") as source: # use "test.wav" as the audio source
-        audio = r.record(source)     
+    with sr.Microphone() as source:                                                                       
+        print "Speak!"                                                                                   
+        audio = r.listen(source) 
     try:
-    	vnrecognizetext = r.recognize_google(audio, language="vi-VN")
+        print "You said " + r.recognize_google(audio)
     except sr.UnknownValueError:
-    	print("Google Speech Recognition could not understand audio")
+        print "Could not understand audio"
     except sr.RequestError as e:
-    	print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        print "Could not request results; {0}".format(e)
