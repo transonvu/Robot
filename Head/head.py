@@ -53,12 +53,11 @@ while True:
         audio = MP3("response.mp3")
         print audio.info.length
     	os.system("mpg123 response.mp3")
-	print convert(vnresponsetext)
-	ser.write((str(audio.info.length) + " " + convert(vnresponsetext).encode('ascii') + "\n"))
+	    ser.write(str(audio.info.length) + " " + convert(vnresponsetext) + "\n")
 	
 	while 1: 
 		if ser.in_waiting:
-	    		start = ser.readline()
+	    	start = ser.readline()
 			if start == "0\n":
 				break;
 
