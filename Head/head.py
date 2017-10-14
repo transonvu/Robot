@@ -14,7 +14,7 @@ cw = CleverWrap("CC1jbQ1nO5wGPNeZ5UgNCKuhH5g")
 r = sr.Recognizer()
 
 while True:
-    with sr.Microphone(device_index=3) as source:   
+    with sr.Microphone() as source:   
         r.adjust_for_ambient_noise(source)                                                                     
         print "Speak!"                                                                                   
         audio = r.listen(source) 
