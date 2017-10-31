@@ -42,51 +42,19 @@ from sphinxbase.sphinxbase import *
 import speech_recognition as sr
 from subprocess import call
 from gtts import gTTS
-import Serial
+#import Serial
 from mutagen.mp3 import MP3
 import re
+from flask import Flask, render_template
+from flask_socketio import SocketIO, emit
+import thread
 
-serial = Serial.Serial()
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+#serial = Serial.Serial()
 # Import the required modules
-import cv2
-import os
-import numpy as np
-import freenect
-import cv2gpu
-from PIL import Image
-import time 
-
-
-cascadeCudaPath = "haarcascade_frontalface_default_cuda.xml"
-cascadePath = "haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascadePath)
-
-recognizer = cv2.createLBPHFaceRecognizer()
-
-def get_video():
-    array,_ = freenect.sync_get_video()
-    array = cv2.cvtColor(array,cv2.COLOR_RGB2BGR)
-    return array
-
-
-def get_images_and_labels(path):
-    image_paths = [os.path.join(path, f) for f in os.listdir(path) if not f.endswith('.tst')]
-    images = []
-    labels = []
-    for image_path in image_paths:
-        image_pil = Image.open(image_path).convert('L')
-        image = np.array(image_pil, 'uint8')
-        nbr = int(os.path.split(image_path)[1].split("_")[0])
-        print image_path, nbr
-        images.append(image)
-        labels.append(nbr)
-    return images, labels
-
-path = './faces'
-images, labels = get_images_and_labels(path)
-
-recognizer.train(images, np.array(labels))
-
 
 modeldir = "/usr/share/pocketsphinx/model/"
 datadir = "../../../test/data"
@@ -100,7 +68,7 @@ config.set_float('-kws_threshold', 1e-20)
 
 decoder = Decoder(config)
 
-decoder.set_kws("kitty","kitty.txt");
+decoder.set_kws("kitty","kitty.txt")
 
 jsgf2 = Jsgf('aeiou.gram')
 rule2 = jsgf2.get_rule('aeiou.aeiou')
@@ -229,8 +197,8 @@ def do_nlu(text):
         
     cmd = "xin chào"
     if text.find(cmd)>=0:
-        isThinh = False
-     
+        emit('ques', {'ques': 'xin chào'})
+        emit('ans', {'ans': 'xin chào'})
 
         s = u"xin chào"
         tts = gTTS(text=s, lang='vi')
@@ -238,65 +206,75 @@ def do_nlu(text):
         call(["mpg123","out.mp3"])
         audio = MP3("out.mp3")
         print "convert ", convert(s)
-        serial.sendMessage(str(audio.info.length) + "|" + "xinchao" + "|" + "xinchao")
-        isStop = False
-        while isStop == False:
-            while serial.inWaiting():
-                s = serial.readMessage()
-                if  s.find("OK") != -1:
-                    isStop = True
-                    break
-	return
+        # serial.sendMessage(str(audio.info.length) + "|" + "xinchao" + "|" + "xinchao")
+        # isStop = False
+        # while isStop == False:
+        #     while serial.inWaiting():
+        #         s = serial.readMessage()
+        #         if  s.find("OK") != -1:
+        #             isStop = True
+        #             break
 
        
+def listening():
+    # Process audio chunk by chunk. On keyword detected perform action and restart search
+    decoder.set_search("kitty")
+    decoder.start_utt()
 
-# Process audio chunk by chunk. On keyword detected perform action and restart search
-decoder.set_search("kitty")
-decoder.start_utt()
+    print "listening keyword kitty"
 
-print "listening keyword kitty"
+    data = []
+    while True:
+        buf = stream.read(1024)
+        if buf:
+            decoder.process_raw(buf, False, False)
+            if len(data)>20:
+                data.pop(0)
+            data.append(buf)
 
-data = []
-while True:
-    buf = stream.read(1024)
-    if buf:
-        decoder.process_raw(buf, False, False)
-        if len(data)>20:
-            data.pop(0)
-        data.append(buf)
+        else:
+            break
+        if decoder.hyp() != None:
+            end_utt = False
+            for seg in decoder.seg():
+                #print ("Detected keyword, restarting search")
+                print seg.word
+                if (seg.word.find("kitty")>=0):
+                
+                    if len(data)>10:
+                        s = do_rec_data(data)
+                        s = s.lower()
+                        print s
+                        # data = []
+                        if s.find("kitty")>=0:
+                            print "keyword is detected"
+                            call(["aplay","aha.wav"])
+                            decoder.end_utt()
+                            end_utt = True
+                            out = do_rec()
+                            do_nlu(out)
+                            data = []
+                            break
+                        else:
+                            print "false alarm"
+                            emit('ques', {'ques': 'đang nghe ...'})
+                            emit('ans', {'ans': ''})
 
-    else:
-        break
-    if decoder.hyp() != None:
-        end_utt = False
-        for seg in decoder.seg():
-            #print ("Detected keyword, restarting search")
-            print seg.word
-            if (seg.word.find("kitty")>=0):
-            
-                if len(data)>10:
-                    s = do_rec_data(data)
-                    s = s.lower()
-                    print s
-                    # data = []
-                    if s.find("kitty")>=0:
-                        print "keyword is detected"
-                        call(["aplay","aha.wav"])
-                        decoder.end_utt()
-                        end_utt = True
-                        out = do_rec()
-                        do_nlu(out)
-                        data = []
-                        break
                     else:
-                        print "false alarm"
-                else:
-                    print "audio too short"
-        if not end_utt:
-            decoder.end_utt()
-        decoder.set_search("kitty")
-        decoder.start_utt()
-        print "listening keyword kitty"
+                        print "audio too short"
+            if not end_utt:
+                decoder.end_utt()
+            decoder.set_search("kitty")
+            decoder.start_utt()
+            print "listening keyword kitty"
         
+@socketio.on('connect')
+def test_connect():
+    print('Client connected!')
 
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected!')
 
+thread.start_new_thread(listening, ())
+socketio.run(app, host='192.168.20.120', port=3001)
