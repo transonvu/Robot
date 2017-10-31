@@ -83,6 +83,7 @@ def video_feed():
 def face_recognizer():
     found = False
     time.sleep(5)
+    print "Found: ", found
     return Response(str(int(found)), mimetype='text/xml')
 
 thread.start_new_thread(get_video, ())
