@@ -26,12 +26,13 @@ image = None
 
 def get_video():
     global image
+    global found
     while (1):
         img,_ = freenect.sync_get_video()
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         #faces = cv2gpu.find_faces(gray_img)
-        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
+        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.05, minNeighbors=3, minSize=(80, 80))
 
         for (x, y, w, h) in faces:
             nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
@@ -81,6 +82,7 @@ def video_feed():
 
 @app.route('/face_recognizer', methods=['POST'])
 def face_recognizer():
+    global found
     found = False
     time.sleep(5)
     print "Found: ", found

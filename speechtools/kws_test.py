@@ -193,7 +193,7 @@ def do_nlu(text):
         response = conn.getresponse()
         data = response.read()
         print "Thinh: ", data
-        if data == 1:
+        if data.find('1') != -1:
             answer = "chào Thịnh"
 
     print answer
