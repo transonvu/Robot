@@ -48,7 +48,7 @@ import re
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import thread
-import Neri
+from Neri import Neri
 import json
 import httplib
 
