@@ -93,7 +93,7 @@ class JaroWinklerDistance:
             left, right = int(max(0, i - limit)), int(min(i + limit + 1, len(second)))
             if l in second[left:right]:
                 common.append(l)
-                second = second[0:second.index(l)] + '*' + second[second.index(l) + 1:]
+                second = second[0:second.index(l)] + u'*' + second[second.index(l) + 1:]
 
         return ''.join(common)
 
