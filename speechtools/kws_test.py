@@ -281,6 +281,8 @@ def listening():
                         print s
                         # data = []
                         if s.find("kitty")>=0:
+                            socketio.emit('ques', {'ques': 'đang nghe ...'})
+                            socketio.emit('ans', {'ans': ''})
                             print "keyword is detected"
                             call(["aplay","aha.wav"])
                             decoder.end_utt()
@@ -291,8 +293,6 @@ def listening():
                             break
                         else:
                             print "false alarm"
-                            socketio.emit('ques', {'ques': 'đang nghe ...'})
-                            socketio.emit('ans', {'ans': ''})
 
                     else:
                         print "audio too short"
