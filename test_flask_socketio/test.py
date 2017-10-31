@@ -20,7 +20,7 @@ recognizer = cv2.createLBPHFaceRecognizer()
 
 #faceCascade = cv2.CascadeClassifier(cascadePath)
 #recognizer = cv2.face.LBPHFaceRecognizer_create()
-g
+
 found = False
 image = None
 
