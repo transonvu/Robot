@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image
 import time
 import freenect
+import thread
 #import cv2gpu
 
 app = Flask(__name__)
@@ -20,36 +21,26 @@ recognizer = cv2.createLBPHFaceRecognizer()
 faceCascade = cv2.CascadeClassifier(cascadePath)
 #recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-isRecognizer = False
 found = False
-img = 0
-
-def video(dev, data, timestamp):
-    img = data
+img = None
 
 def get_video():
+    while (1):
+        img = freenect.sync_get_video()
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = faceCascade.detectMultiScale(gray_img, minSize=(60, 60))
+
+        for (x, y, w, h) in faces:
+            nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
+    	    if nbr_predicted == 16 and conf >= 40 and conf <= 100:
+                cv2.rectangle(img, (x ,y), (x + w, y + h), (0, 255, 0), 2)
+                found = True
+            else:
+                cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
+
+def get_frame():
     global img
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    return img
-
-def get_detect_video():
-    global img
-    #faces = cv2gpu.find_faces(img)
-    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(gray_img, minSize=(60, 60))
-
-    for (x, y, w, h) in faces:
-        nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
-    	if nbr_predicted == 16 and conf >= 40 and conf <= 100:
-            cv2.rectangle(img, (x ,y), (x + w, y + h), (0, 255, 0), 2)
-            found = True
-        else:
-            cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
-
-    return img
-
-
-def get_frame(img):
     ret, jpeg = cv2.imencode('.jpg', img)
     return jpeg.tobytes()
 
@@ -75,13 +66,8 @@ def index():
     return render_template('index.html')
 
 def gen():
-    global isRecognizer
     while True:
-        if isRecognizer:
-            frame = get_frame(get_detect_video())
-        else:
-            frame = get_frame(get_video())
-            
+        frame = get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
@@ -92,12 +78,9 @@ def video_feed():
 
 @app.route('/face_recognizer', methods=['POST'])
 def face_recognizer():
-    global isRecognizer 
-    isRecognizer = True
     found = False
     time.sleep(5)
-    isRecognizer = False
     return Response(str(int(found)), mimetype='text/xml')
 
+thread.start_new_thread(get_video)
 app.run(host='192.168.20.120', port=3000, threaded=True)
-freenect.runloop(video=video)
