@@ -27,11 +27,7 @@ img = 0
 def video(dev, data, timestamp):
     img = data
 
-def body(*args):
-    if not keep_running:
-        raise freenect.Kill
-
-freenect.runloop(video=video, body=body)
+freenect.runloop(video=video)
 
 def get_video():
     global img
