@@ -27,8 +27,6 @@ img = 0
 def video(dev, data, timestamp):
     img = data
 
-freenect.runloop(video=video)
-
 def get_video():
     global img
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
@@ -102,4 +100,4 @@ def face_recognizer():
     return Response(str(int(found)), mimetype='text/xml')
 
 app.run(host='192.168.20.120', port=3000, threaded=True)
-
+freenect.runloop(video=video)
