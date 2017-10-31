@@ -1,0 +1,8 @@
+    # aeiou grammar
+    jsgf2 = Jsgf(os.path.join(model_dir, 'aeiou.gram'))
+    rule2 = jsgf2.get_rule('aeiou.aeiou')
+    fsg2 = jsgf2.build_fsg(rule2, decoder.get_logmath(), 7.5)
+    fsg2.writefile(os.path.join(model_dir, 'aeiou.fsg'))
+    decoder.set_fsg("aeiou", fsg2)
+
+
