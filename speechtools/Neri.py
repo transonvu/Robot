@@ -54,6 +54,7 @@ class Neri:
         jaroWinklerDistance = JaroWinklerDistance()
         scoreTable = [0] * self.__numQuestions
         words = set(question.split(' '))
+        print words
         for word in words:
             filtered = [w for w in keys if jaroWinklerDistance.get_jaro_distance(word, w) > 0.9]
             if len(filtered) > 0:
