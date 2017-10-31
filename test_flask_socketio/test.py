@@ -83,5 +83,5 @@ def face_recognizer():
     time.sleep(5)
     return Response(str(int(found)), mimetype='text/xml')
 
-thread.start_new_thread(get_video)
+thread.start_new_thread(get_video, ())
 app.run(host='192.168.20.120', port=3000, threaded=True)
