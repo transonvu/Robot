@@ -25,9 +25,9 @@ found = False
 img = None
 
 def get_video():
+    global img
     while (1):
-        global img
-        img = freenect.sync_get_video()
+        img,_ = freenect.sync_get_video()
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(gray_img, minSize=(60, 60))
