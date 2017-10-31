@@ -20,9 +20,6 @@ class Serial:
 
     def sendMessage(self, msg):
         self.__serial.write(msg + "\r\n")
-        
-    def sendMessage(self, msg):
-        self.__serial.write(msg + "\r\n")
 
     def readMessage(self):
         return self.__serial.readline()

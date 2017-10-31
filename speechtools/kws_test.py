@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ====================================================================
 # Copyright (c) 2013 Carnegie Mellon University.  All rights
@@ -194,7 +195,7 @@ def do_nlu(text):
         if data == 1:
             answer = "Chào Thịnh"
 
-    tts = gTTS(text=answer, lang='vi')
+    tts = gTTS(text=answer.decode("utf8"), lang='vi')
     tts.save("out.mp3")
     call(["mpg123","out.mp3"])
     audio = MP3("out.mp3")
@@ -202,6 +203,15 @@ def do_nlu(text):
     socketio.emit('ques', {'ques': question})
     socketio.emit('ans', {'ans': answer})
     
+    # serial.sendMessage(str(audio.info.length) + "|" + "xinchao" + "|" + "xinchao")
+    # isStop = False
+    # while isStop == False:
+    #     while serial.inWaiting():
+    #         s = serial.readMessage()
+    #         if  s.find("OK") != -1:
+    #             isStop = True
+    #             break
+
     # cmd = "mấy giờ rồi"
     # if text.find(cmd)>=0:
     #     t = datetime.datetime.now()
