@@ -197,8 +197,8 @@ def do_nlu(text):
         
     cmd = "xin chào"
     if text.find(cmd)>=0:
-        emit('ques', {'ques': 'xin chào'})
-        emit('ans', {'ans': 'xin chào'})
+        socketio.emit('ques', {'ques': 'xin chào'})
+        socketio.emit('ans', {'ans': 'xin chào'})
 
         s = u"xin chào"
         tts = gTTS(text=s, lang='vi')
