@@ -56,13 +56,13 @@ socketio = SocketIO(app)
 #serial = Serial.Serial()
 # Import the required modules
 
-modeldir = "/usr/share/pocketsphinx/model/"
-datadir = "../../../test/data"
+modeldir = "/usr/local/lib/python2.7/dist-packages/pocketsphinx/model"
+datadir = "/usr/local/lib/python2.7/dist-packages/pocketsphinx/data"
 
 # Create a decoder with certain model
 config = Decoder.default_config()
-config.set_string('-hmm', os.path.join(modeldir, 'en-us/en-us'))
-config.set_string('-dict', os.path.join(modeldir, 'en-us/cmudict-en-us.dict'))
+config.set_string('-hmm', os.path.join(modeldir, 'en-us'))
+config.set_string('-dict', os.path.join(modeldir, 'cmudict-en-us.dict'))
 #config.set_string('-keyphrase', 'kitty')
 config.set_float('-kws_threshold', 1e-20)
 
