@@ -25,6 +25,7 @@ found = False
 img = None
 
 def get_video():
+    global img
     while (1):
         img = freenect.sync_get_video()
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
