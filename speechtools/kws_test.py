@@ -48,10 +48,14 @@ import re
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import thread
+import Neri
+import json
+import httplib
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+neri = Neri()
 
 #serial = Serial.Serial()
 # Import the required modules
@@ -179,33 +183,52 @@ def convert(text):
 
 def do_nlu(text):
     text = text.lower().encode('utf8')
-    cmd = "mấy giờ rồi"
-    if text.find(cmd)>=0:
-        t = datetime.datetime.now()
-        s = str(t.hour) + ":" + str(t.minute)
-        tts = gTTS(text=s, lang='vi')
-        tts.save("out.mp3")
-        audio = MP3("out.mp3")
-        call(["mpg123","out.mp3"])
-    
-    cmd = "bạn có thể làm gì"
-    if text.find(cmd)>=0:
-        s = u"tôi có thể làm giám đốc công ty golden eye thay anh An"
-        tts = gTTS(text=s, lang='vi')
-        tts.save("out.mp3")
-        call(["mpg123","out.mp3"])
-        
-    cmd = "xin chào"
-    if text.find(cmd)>=0:
-        socketio.emit('ques', {'ques': 'xin chào'})
-        socketio.emit('ans', {'ans': 'xin chào'})
+    question, answer, score = neri.ask(text)
 
-        s = u"xin chào"
-        tts = gTTS(text=s, lang='vi')
-        tts.save("out.mp3")
-        call(["mpg123","out.mp3"])
-        audio = MP3("out.mp3")
-        print "convert ", convert(s)
+    cmd = "chào"
+    if score.find(cmd)>=0:
+        conn = httplib.HTTPConnection(host='192.168.20.120', port=3000)
+        conn.request('POST', '/face_recognizer')
+        response = conn.getresponse()
+        data = response.read()
+        if data == 1:
+            answer = "Chào Thịnh"
+
+    tts = gTTS(text=answer, lang='vi')
+    tts.save("out.mp3")
+    call(["mpg123","out.mp3"])
+    audio = MP3("out.mp3")
+    print answer
+    socketio.emit('ques', {'ques': question})
+    socketio.emit('ans', {'ans': answer})
+    
+    # cmd = "mấy giờ rồi"
+    # if text.find(cmd)>=0:
+    #     t = datetime.datetime.now()
+    #     s = str(t.hour) + ":" + str(t.minute)
+    #     tts = gTTS(text=s, lang='vi')
+    #     tts.save("out.mp3")
+    #     audio = MP3("out.mp3")
+    #     call(["mpg123","out.mp3"])
+    
+    # cmd = "bạn có thể làm gì"
+    # if text.find(cmd)>=0:
+    #     s = u"tôi có thể làm giám đốc công ty golden eye thay anh An"
+    #     tts = gTTS(text=s, lang='vi')
+    #     tts.save("out.mp3")
+    #     call(["mpg123","out.mp3"])
+        
+    # cmd = "xin chào"
+    # if text.find(cmd)>=0:
+    #     socketio.emit('ques', {'ques': 'xin chào'})
+    #     socketio.emit('ans', {'ans': 'xin chào'})
+
+    #     s = u"xin chào"
+    #     tts = gTTS(text=s, lang='vi')
+    #     tts.save("out.mp3")
+    #     call(["mpg123","out.mp3"])
+    #     audio = MP3("out.mp3")
+    #     print "convert ", convert(s)
         # serial.sendMessage(str(audio.info.length) + "|" + "xinchao" + "|" + "xinchao")
         # isStop = False
         # while isStop == False:
