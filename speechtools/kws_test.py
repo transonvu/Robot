@@ -187,7 +187,7 @@ def do_nlu(text):
     question, answer, score = neri.ask(text)
 
     cmd = "chào"
-    if score.find(cmd)>=0:
+    if question.find(cmd)>=0:
         conn = httplib.HTTPConnection(host='192.168.20.120', port=3000)
         conn.request('POST', '/face_recognizer')
         response = conn.getresponse()
@@ -201,7 +201,7 @@ def do_nlu(text):
     call(["mpg123","out.mp3"])
     audio = MP3("out.mp3")
     print answer
-    socketio.emit('ques', {'ques': question})
+    socketio.emit('ques', {'ques': text})
     socketio.emit('ans', {'ans': answer})
     
     # serial.sendMessage(str(audio.info.length) + "|" + "xinchao" + "|" + "xinchao")
