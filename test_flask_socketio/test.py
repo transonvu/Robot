@@ -9,28 +9,29 @@ from PIL import Image
 import time
 import freenect
 import thread
-#import cv2gpu
+import cv2gpu
 
 app = Flask(__name__)
 
 cascadePath = "haarcascade_frontalface_default.xml"
 
-#cv2gpu.init_gpu_detector(cascadePath)
+cv2gpu.init_gpu_detector(cascadePath)
 recognizer = cv2.createLBPHFaceRecognizer()
 
-faceCascade = cv2.CascadeClassifier(cascadePath)
+#faceCascade = cv2.CascadeClassifier(cascadePath)
 #recognizer = cv2.face.LBPHFaceRecognizer_create()
-
+g
 found = False
-img = None
+image = None
 
 def get_video():
-    global img
+    global image
     while (1):
         img,_ = freenect.sync_get_video()
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceCascade.detectMultiScale(gray_img, minSize=(60, 60))
+        faces = cv2gpu.find_faces(gray_img)
+        #faces = faceCascade.detectMultiScale(gray_img)
 
         for (x, y, w, h) in faces:
             nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
@@ -39,10 +40,11 @@ def get_video():
                 found = True
             else:
                 cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
+        image = img
 
 def get_frame():
-    global img
-    ret, jpeg = cv2.imencode('.jpg', img)
+    global image
+    ret, jpeg = cv2.imencode('.jpg', image)
     return jpeg.tobytes()
 
 def get_images_and_labels(path):
