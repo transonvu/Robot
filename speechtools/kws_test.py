@@ -257,8 +257,8 @@ def listening():
                             break
                         else:
                             print "false alarm"
-                            emit('ques', {'ques': 'đang nghe ...'})
-                            emit('ans', {'ans': ''})
+                            socketio.emit('ques', {'ques': 'đang nghe ...'})
+                            socketio.emit('ans', {'ans': ''})
 
                     else:
                         print "audio too short"
