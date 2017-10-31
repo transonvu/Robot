@@ -15,10 +15,10 @@ app = Flask(__name__)
 
 cascadePath = "haarcascade_frontalface_default.xml"
 
-cv2gpu.init_gpu_detector(cascadePath)
+#cv2gpu.init_gpu_detector(cascadePath)
 recognizer = cv2.createLBPHFaceRecognizer()
 
-#faceCascade = cv2.CascadeClassifier(cascadePath)
+faceCascade = cv2.CascadeClassifier(cascadePath)
 #recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 found = False
@@ -30,8 +30,8 @@ def get_video():
         img,_ = freenect.sync_get_video()
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = cv2gpu.find_faces(gray_img)
-        #faces = faceCascade.detectMultiScale(gray_img)
+        #faces = cv2gpu.find_faces(gray_img)
+        faces = faceCascade.detectMultiScale(gray_img)
 
         for (x, y, w, h) in faces:
             nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
