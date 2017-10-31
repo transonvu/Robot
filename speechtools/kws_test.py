@@ -183,7 +183,7 @@ def convert(text):
     return output
 
 def do_nlu(text):
-    text = text.lower().encode('utf8')
+    text = text.lower()
     question, answer, score = neri.ask(text)
 
     cmd = "chào"
@@ -193,7 +193,7 @@ def do_nlu(text):
         response = conn.getresponse()
         data = response.read()
         if data == 1:
-            answer = "Chào Thịnh"
+            answer = "chào Thịnh"
 
     tts = gTTS(text=answer.decode("utf8"), lang='vi')
     tts.save("out.mp3")
