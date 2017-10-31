@@ -192,6 +192,7 @@ def do_nlu(text):
         conn.request('POST', '/face_recognizer')
         response = conn.getresponse()
         data = response.read()
+        print "Thinh: ", data
         if data == 1:
             answer = "chào Thịnh"
 
