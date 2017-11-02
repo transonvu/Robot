@@ -36,23 +36,23 @@ def get_video():
     global image
     global found
     while (1):
-        video = freenect.sync_get_video()
-        if video is None:
-            continue
-        img, _ = video
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        #faces = cv2gpu.find_faces(gray_img)
-        faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.05, minNeighbors=3, minSize=(80, 80))
+        try:
+            img, _ = freenect.sync_get_video()
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            #faces = cv2gpu.find_faces(gray_img)
+            faces = faceCascade.detectMultiScale(gray_img, scaleFactor=1.05, minNeighbors=3, minSize=(80, 80))
 
-        for (x, y, w, h) in faces:
-            nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
-    	    if nbr_predicted == 16 and conf >= 40 and conf <= 100:
-                cv2.rectangle(img, (x ,y), (x + w, y + h), (0, 255, 0), 2)
-                found = True
-            else:
-                cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
-        image = img
+            for (x, y, w, h) in faces:
+                nbr_predicted, conf = recognizer.predict(gray_img[y: y + h, x: x + w])
+                if nbr_predicted == 16 and conf >= 40 and conf <= 100:
+                    cv2.rectangle(img, (x ,y), (x + w, y + h), (0, 255, 0), 2)
+                    found = True
+                else:
+                    cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
+            image = img        
+        except:
+            pass
 
 def get_frame():
     global image
