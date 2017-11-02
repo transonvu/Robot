@@ -317,8 +317,8 @@ def test_connect():
 def test_disconnect():
     print('Client disconnected!')
 
-thread.start_new_thread(listening, ())
-
 while not check_connected():
     pass
+
+thread.start_new_thread(listening, ())
 socketio.run(app, host='192.168.20.120', port=3001)
