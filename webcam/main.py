@@ -17,7 +17,6 @@ from flask import Flask, render_template, Response
 import cv2
 import thread
 import urllib2
-import time
 
 app = Flask(__name__)
 video = cv2.VideoCapture(0)
@@ -57,7 +56,6 @@ def video_feed():
 
 while not check_connected():
     pass
-time.sleep(30)
 thread.start_new_thread(get_video, ())
 app.run(host='192.168.20.120', port=4000, threaded=True)
 video.release()
