@@ -36,14 +36,15 @@ def get_video():
         success, image = self.video.read()
 
 def get_frame():
-        ret, jpeg = cv2.imencode('.jpg', image)
-        return jpeg.tobytes()
+    global image
+    ret, jpeg = cv2.imencode('.jpg', image)
+    return jpeg.tobytes()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-def gen(camera):
+def gen():
     while True:
         frame = get_frame()
         yield (b'--frame\r\n'
@@ -51,11 +52,11 @@ def gen(camera):
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(VideoCamera()),
+    return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    while not check_connected():
-        pass
-    thread.start_new_thread(get_video, ())
-    app.run(host='192.168.20.120', port=4000, threaded=True)
-    video.release()
+while not check_connected():
+    pass
+thread.start_new_thread(get_video, ())
+app.run(host='192.168.20.120', port=4000, threaded=True)
+video.release()
