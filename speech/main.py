@@ -53,6 +53,7 @@ from Neri import Neri
 import json
 import httplib
 import urllib2
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -335,5 +336,6 @@ def test_disconnect():
 
 while not check_connected():
     pass
+time.sleep(30)
 thread.start_new_thread(listening, ())
 socketio.run(app, host='192.168.20.120', port=3001)
