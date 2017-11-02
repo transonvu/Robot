@@ -10,5 +10,7 @@ sudo bash -c 'echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_go
 
 sudo resetusb
 
-python camera/main.py &
-python speech/main.py
+current_dir = $(dirname $0)
+
+python $current_dir/camera/main.py &
+python $current_dir/speech/main.py
