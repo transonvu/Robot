@@ -36,7 +36,10 @@ def get_video():
     global image
     global found
     while (1):
-        img,_ = freenect.sync_get_video()
+        video = freenect.sync_get_video()
+        if video is None:
+            continue
+        img, _ = video
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         #faces = cv2gpu.find_faces(gray_img)
