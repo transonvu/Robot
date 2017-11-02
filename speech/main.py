@@ -311,7 +311,7 @@ def listening():
         
 @socketio.on('connect')
 def test_connect():
-    emit('ques', {'ques': '�^�ang nghe ...'})
+    emit('ques', {'ques': 'đang nghe ...'})
     print('Client connected!')
 
 @socketio.on('disconnect')
