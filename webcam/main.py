@@ -32,7 +32,7 @@ def check_connected():
 def get_video():
     global image
     while 1:
-        success, image = self.video.read()
+        success, image = video.read()
 
 def get_frame():
     global image
