@@ -13,4 +13,5 @@ sudo resetusb
 script_dir=$(dirname $0)
 echo $script_dir
 cd $script_dir/camera && python main.py &
-cd $script_dir/speech && python main.py
+cd $script_dir/speech && python main.py &
+cd $script_dir/webcam && python main.py
