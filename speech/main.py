@@ -95,6 +95,9 @@ stream.start_stream()
 
 google_decoder = sr.Recognizer()
 
+ques = ""
+ans = ""
+kitty = "Đang nghe kitty"
 def check_connected():
     try:
         urllib2.urlopen('http://216.58.192.142', timeout=1)
@@ -190,6 +193,8 @@ def convert(text):
     return output
 
 def do_nlu(text):
+    global ques
+    global ans
     text = text.lower()
     question, answer, score = neri.ask(text)
 
@@ -204,8 +209,10 @@ def do_nlu(text):
             answer = "chào Thịnh"
 
     print answer
-    socketio.emit('ques', {'ques': text})
-    socketio.emit('ans', {'ans': answer})
+    ques = text
+    ans = answer
+    socketio.emit('ques', {'ques': ques})
+    socketio.emit('ans', {'ans': ans})
     tts = gTTS(text=answer.decode("utf8"), lang='vi')
     tts.save("out.mp3")
     call(["mpg123","out.mp3"])
@@ -258,6 +265,7 @@ def do_nlu(text):
 
        
 def listening():
+    global kitty
     # Process audio chunk by chunk. On keyword detected perform action and restart search
     decoder.set_search("kitty")
     decoder.start_utt()
@@ -288,8 +296,8 @@ def listening():
                         print s
                         # data = []
                         if s.find("kitty")>=0:
-                            socketio.emit('ques', {'ques': 'đang nghe ...'})
-                            socketio.emit('ans', {'ans': ''})
+                            kitty = "Đã nghe kitty"
+                            socketio.emit('kitty', {'kitty': kitty})
                             print "keyword is detected"
                             call(["aplay","aha.wav"])
                             decoder.end_utt()
@@ -300,6 +308,8 @@ def listening():
                             break
                         else:
                             print "false alarm"
+                            kitty = "Đang nghe kitty"
+                            socketio.emit('kitty', {'kitty': kitty})
 
                     else:
                         print "audio too short"
@@ -311,7 +321,12 @@ def listening():
         
 @socketio.on('connect')
 def test_connect():
-    emit('ques', {'ques': 'đang nghe ...'})
+    global ques
+    global ans
+    global kitty
+    emit('ques', {'ques': ques})
+    emit('ans', {'ques': ans})
+    emit('kitty', {'kitty': kitty})
     print('Client connected!')
 
 @socketio.on('disconnect')
