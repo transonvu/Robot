@@ -50,14 +50,19 @@ def get_video():
                     found = True
                 else:
                     cv2.rectangle(img, (x ,y), (x + w, y + h), (255, 0, 0), 2)            
-            image = img        
+            image = img
         except:
             pass
 
 def get_frame():
     global image
-    ret, jpeg = cv2.imencode('.jpg', image)
-    return jpeg.tobytes()
+    try:
+        ret, jpeg = cv2.imencode('.jpg', image)
+    except:
+        pass
+    else:
+        return jpeg.tobytes()
+    return ""
 
 def get_images_and_labels(path):
     image_paths = [os.path.join(path, f) for f in os.listdir(path)]
@@ -83,8 +88,9 @@ def index():
 def gen():
     while True:
         frame = get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        if frame != "":
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 @app.route('/video_feed')
 def video_feed():
