@@ -52,6 +52,7 @@ import thread
 from Neri import Neri
 import json
 import httplib
+import urllib2
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -94,6 +95,12 @@ stream.start_stream()
 
 google_decoder = sr.Recognizer()
 
+def check_connected():
+    try:
+        urllib2.urlopen('http://216.58.192.142', timeout=1)
+        return True
+    except urllib2.URLError as err: 
+        return False
 
 def do_rec_data(data):
     audio = sr.AudioData(''.join(data), 16000, 2)
@@ -311,4 +318,7 @@ def test_disconnect():
     print('Client disconnected!')
 
 thread.start_new_thread(listening, ())
+
+while not check_connected():
+    pass
 socketio.run(app, host='192.168.20.120', port=3001)

@@ -9,6 +9,7 @@ from PIL import Image
 import time
 import freenect
 import thread
+import urllib2
 #import cv2gpu
 
 app = Flask(__name__)
@@ -61,6 +62,13 @@ def get_images_and_labels(path):
         labels.append(nbr)
     return images, labels
 
+def check_connected():
+    try:
+        urllib2.urlopen('http://216.58.192.142', timeout=1)
+        return True
+    except urllib2.URLError as err: 
+        return False
+
 path = './faces'
 images, labels = get_images_and_labels(path)
 recognizer.train(images, np.array(labels))
@@ -88,5 +96,9 @@ def face_recognizer():
     print "Found: ", found
     return Response(str(int(found)), mimetype='text/xml')
 
+
 thread.start_new_thread(get_video, ())
+
+while not check_connected():
+    pass
 app.run(host='192.168.20.120', port=3000, threaded=True)
