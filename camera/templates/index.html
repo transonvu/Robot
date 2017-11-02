@@ -21,6 +21,9 @@
           <div class="row">
             Kitty: <p id="ans" style="font-size:30px"></p>                
           </div>                
+          <div class="row">
+            <p id="kitty" style="font-size:30px"></p>                
+          </div>                
         </div>
       </div>
   </body>
@@ -37,6 +40,10 @@
     socket.on('ans', function(data){
       console.log(data.ans);
       $("#ans").text(data.ans);
+    });
+    socket.on('kitty', function(data){
+      console.log(data.kitty);
+      $("#kitty").text(data.kitty);
     });
     socket.on('disconnect', function(){
       console.log('Disconnect server!')
