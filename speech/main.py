@@ -311,6 +311,7 @@ def listening():
         
 @socketio.on('connect')
 def test_connect():
+    emit('ques', {'ques': '�^�ang nghe ...'})
     print('Client connected!')
 
 @socketio.on('disconnect')
@@ -319,6 +320,5 @@ def test_disconnect():
 
 while not check_connected():
     pass
-
 thread.start_new_thread(listening, ())
 socketio.run(app, host='192.168.20.120', port=3001)
