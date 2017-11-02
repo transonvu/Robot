@@ -14,7 +14,6 @@
 # 2. Run "python main.py".
 # 3. Navigate the browser to the local webpage.
 from flask import Flask, render_template, Response
-from camera import VideoCamera
 import cv2
 import thread
 import urllib2
