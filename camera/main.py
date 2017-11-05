@@ -78,8 +78,13 @@ def get_images_and_labels(path):
     return images, labels
 
 path = './faces'
-images, labels = get_images_and_labels(path)
-recognizer.train(images, np.array(labels))
+pathYML = "./../../data.yml"
+if os.path.isfile(pathYML):
+    print 'yml'
+    recognizer.load(pathYML)
+else:
+    images, labels = get_images_and_labels(path)
+    recognizer.train(images, np.array(labels))
 
 @app.route('/')
 def index():
