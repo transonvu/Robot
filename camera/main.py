@@ -64,27 +64,41 @@ def get_frame():
         return jpeg.tobytes()
     return ""
 
+#def get_images_and_labels(path):
+#    image_paths = [os.path.join(path, f) for f in os.listdir(path)]
+#    images = []
+#    labels = []
+#    for image_path in image_paths:
+#        image_pil = Image.open(image_path).convert('L')
+#        image = np.array(image_pil, 'uint8')
+#        nbr = int(os.path.split(image_path)[1].split("_")[0])
+#        print image_path, nbr
+#        images.append(image)
+#        labels.append(nbr)
+#    return images, labels
+
 def get_images_and_labels(path):
     image_paths = [os.path.join(path, f) for f in os.listdir(path)]
     images = []
     labels = []
     for image_path in image_paths:
-        image_pil = Image.open(image_path).convert('L')
-        image = np.array(image_pil, 'uint8')
-        nbr = int(os.path.split(image_path)[1].split("_")[0])
-        print image_path, nbr
-        images.append(image)
-        labels.append(nbr)
+	name = os.path.split(image_path)[1].split(".")[0]
+	dir = path + "/" + name
+	nbr = int(name.replace("person-", ""))
+	file_paths = [os.path.join(image_path, f) for f in os.listdir(image_path) if f.endswith('.png')]
+
+	for file_path in file_paths:
+        	image_pil = Image.open(file_path).convert('L')
+        	image = np.array(image_pil, 'uint8')
+        	print file_path, nbr
+        	images.append(image)
+        	labels.append(nbr)
+    print len(images)
     return images, labels
 
-path = './faces'
-pathYML = "./../../data.yml"
-if os.path.isfile(pathYML):
-    print 'yml'
-    recognizer.load(pathYML)
-else:
-    images, labels = get_images_and_labels(path)
-    recognizer.train(images, np.array(labels))
+path = "../../ExtendedYaleB_data"
+images, labels = get_images_and_labels(path)
+recognizer.train(images, np.array(labels))
 
 @app.route('/')
 def index():
